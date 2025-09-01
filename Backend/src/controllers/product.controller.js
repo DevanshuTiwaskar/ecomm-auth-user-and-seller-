@@ -51,6 +51,7 @@ async function getSellerProducts(req, res) {
 }
 
 
+<<<<<<< HEAD
 async function getAllProduct(req,res){
 
     const page = req.query.page ? parseInt(req.query.page) : 1
@@ -96,11 +97,29 @@ async function getProductDetails(req,res){
 
 
 
+=======
+async function getAllProducts(req, res) {
+
+    const page = req.query.page ? parseInt(req.query.page) : 1;
+
+    const products = await productModel.find()
+        .skip((page - 1) * 5)
+        .limit(5)
+
+    res.status(200).json({
+        message: "all products fetched successfully",
+        products
+    })
+>>>>>>> 6cf8996621dda0cb515dfc9e84400505210ae5aa
 }
 
 module.exports = {
     createProduct,
     getSellerProducts,
+<<<<<<< HEAD
     getAllProduct,
     getProductDetails
+=======
+    getAllProducts,
+>>>>>>> 6cf8996621dda0cb515dfc9e84400505210ae5aa
 }

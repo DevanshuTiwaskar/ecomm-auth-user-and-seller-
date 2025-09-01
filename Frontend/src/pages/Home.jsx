@@ -1,8 +1,12 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState,useEffect } from 'react';
 import './Home.css';
+<<<<<<< HEAD
 import axios from 'axios';
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+=======
+import axios from "axios"
+>>>>>>> 6cf8996621dda0cb515dfc9e84400505210ae5aa
 
 // UI only: sample products similar shape to seller endpoint
 // const sampleProducts = [
@@ -43,6 +47,7 @@ import { Link } from 'react-router-dom';
 export default function Home() {
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState('newest');
+<<<<<<< HEAD
   const [products,setProducts] = useState([])
 
   useEffect(()=>{
@@ -60,7 +65,20 @@ export default function Home() {
 
     
 
+=======
+  const [products, setProducts] = useState([])
+>>>>>>> 6cf8996621dda0cb515dfc9e84400505210ae5aa
 
+  useEffect(()=>{
+
+    axios.get("http://localhost:3000/api/products/")
+    .then(response=>{
+      setProducts(response.data.products)
+    })
+    
+  })
+  
+  
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     let list = products.filter(p => !q || p.title.toLowerCase().includes(q) || (p.description||'').toLowerCase().includes(q));
@@ -99,15 +117,20 @@ export default function Home() {
         <div style={{fontSize:'.65rem', color:'var(--color-text-soft)'}} aria-live="polite">{filtered.length} products</div>
       </div>
 
-      {filtered.length === 0 ? (
+      {products.length === 0 ? (
         <div className="empty" role="status">
           <strong>No products</strong>
           Try adjusting your search or filters.
         </div>
       ) : (
         <div className="products-grid" role="list" aria-label="Products">
+<<<<<<< HEAD
           {filtered.map(p => {
             const cover = p.image?.[0];
+=======
+          {products.map(p => {
+            const cover = p.images?.[0];
+>>>>>>> 6cf8996621dda0cb515dfc9e84400505210ae5aa
             const priceFmt = new Intl.NumberFormat('en-IN',{style:'currency', currency:p.price.currency}).format(p.price.amount/100);
             const low = p.stock < 5;
             return (
