@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './SellerRegister.css';
 import './UserRegister.css'; // reuse base auth styles
+import axios from 'axios';
+
 
 export default function SellerRegister() {
   const [form, setForm] = useState({
@@ -22,6 +24,21 @@ export default function SellerRegister() {
   function handleSubmit(e) {
     e.preventDefault();
     // UI only – no API logic
+     axios.post("http://localhost:3000/api/auth/seller/register",{
+      username : form.username,
+      email: form.email,
+      fullName: {
+        firstName: form.firstName,
+        lastName: form.lastName
+      },
+      password: form.password
+     },{withCredentials:true}).then(respose => {
+       console.log(respose.data)
+       navigate('/seller/dashboard')
+     })
+
+
+
   }
 
   function switchRole(nextRole) {

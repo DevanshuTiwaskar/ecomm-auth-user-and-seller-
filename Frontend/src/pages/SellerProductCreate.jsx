@@ -1,5 +1,7 @@
 import { useState, useRef } from 'react';
 import './SellerProductCreate.css';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 // UI only – no API call logic. Placeholder submit handler.
 export default function SellerProductCreate() {
@@ -10,6 +12,8 @@ export default function SellerProductCreate() {
   const [stock, setStock] = useState('');
   const [images, setImages] = useState([]); // { id, file, url }
   const fileInputRef = useRef(null);
+  const navigate = useNavigate()
+
 
   function handleImagesSelected(filesList) {
     const files = Array.from(filesList || []);
@@ -28,19 +32,36 @@ export default function SellerProductCreate() {
     setImages(prev => prev.filter(img => img.id !== id));
   }
 
-  function handleSubmit(e) {
-    e.preventDefault();
-    // Build payload (UI only)
-    const payload = {
-      title,
-      description,
-      price: { amount: Number(priceAmount), currency },
-      stock: Number(stock),
-      images: images.map(i => i.file?.name || i.url)
-    };
-    // No actual API call – just log for development.
-    console.log('Create product payload (UI only):', payload);
-  }
+
+
+function handleSubmit(e) {
+  e.preventDefault();
+  console.log("Submitting product...");
+  const formData = new FormData();
+  formData.append("title", title);
+  formData.append("description", description);
+  formData.append("stock", stock);
+
+  // 👇 Convert price object to JSON string
+  formData.append("price", JSON.stringify({ amount: Number(priceAmount), currency }));
+
+  // 👇 Append images one by one
+  images.forEach(img => {
+    formData.append("images", img.file);
+  });
+
+  axios.post("http://localhost:3000/api/products/", formData, {
+    withCredentials: true,
+    headers: { "Content-Type": "multipart/form-data" },
+  })
+  .then(res => {
+    console.log("Product created:", res.data);
+    navigate('/seller/dashboard')
+  })
+  .catch(err => {
+    console.error("Failed to create product", err);
+  });
+}
 
   const priceError = priceAmount !== '' && Number(priceAmount) <= 0;
   const stockError = stock !== '' && Number(stock) < 0;

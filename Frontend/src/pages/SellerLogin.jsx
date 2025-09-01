@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './SellerLogin.css';
 import './UserRegister.css'; // reuse base auth styles
+import axios from 'axios';
 
 export default function SellerLogin() {
   const [form, setForm] = useState({ identifier: '', password: '' });
@@ -16,6 +17,22 @@ export default function SellerLogin() {
   function handleSubmit(e) {
     e.preventDefault();
     // UI only – no API logic
+     const data = {password: form.password}
+
+     if(form.identifier.includes('@')){
+      data.email = form.email
+     }else{
+      data.username = form.username
+
+     }
+      
+     axios.post('http://localhost:3000/api/auth/seller/login',data,{withCredentials:true})
+     .then(response => {
+      console.log(response.data)
+      navigate("/seller/dashboard")
+     })
+      
+      
   }
 
   function switchRole(nextRole) {

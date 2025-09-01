@@ -16,10 +16,21 @@ router.post('/',
 )
 
 
+
 router.get("/seller",
     authMiddleware.authSeller,
     productController.getSellerProducts
-
+    
 )
+
+router.get('/',
+    productController.getAllProduct
+)
+
+
+router.get('/:id',
+    productController.getProductDetails)
+
+
 
 module.exports = router;

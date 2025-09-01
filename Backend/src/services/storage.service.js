@@ -2,9 +2,9 @@ const ImageKit = require("imagekit");
 const utils = require("../utils/utils")
 
 const imagekit = new ImageKit({
-    publicKey: process.env.IMAGE_KIT_PUBLIC_KEY,
-    privateKey: process.env.IMAGE_KIT_PRIVATE_KEY,
-    urlEndpoint: process.env.IMAGE_KIT_URL_ENDPOINT
+    publicKey: process.env.PUBLIC_KEY,
+    privateKey: process.env.PRIVATE_KEY,
+    urlEndpoint: process.env.URL_ENDPONIT
 });
 
 

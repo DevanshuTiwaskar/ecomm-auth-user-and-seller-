@@ -1,49 +1,69 @@
 import { useMemo, useState } from 'react';
 import './Home.css';
+import axios from 'axios';
+import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 // UI only: sample products similar shape to seller endpoint
-const sampleProducts = [
-  {
-    _id: 'p1',
-    title: 'test_product',
-    description: 'test_description',
-    price: { amount: 999, currency: 'INR' },
-    images: ['https://ik.imagekit.io/hnoglyswo0/kodr_phase_1/faac7bd7-de98-41c6-81ee-1662f17e7ac5_p8DgQjfuxw'],
-    stock: 20
-  },
-  {
-    _id: 'p2',
-    title: 'Minimal Backpack',
-    description: 'Durable & water resistant everyday carry.',
-    price: { amount: 4599, currency: 'INR' },
-    images: ['https://images.unsplash.com/photo-1514474959185-1472d4d4b221?auto=format&fit=crop&w=600&q=60'],
-    stock: 4
-  },
-  {
-    _id: 'p3',
-    title: 'Ceramic Mug',
-    description: 'Hand glazed stoneware mug 350ml.',
-    price: { amount: 1299, currency: 'INR' },
-    images: ['https://images.unsplash.com/photo-1556909114-6d2a7926f397?auto=format&fit=crop&w=600&q=60'],
-    stock: 0
-  },
-  {
-    _id: 'p4',
-    title: 'Wireless Earbuds',
-    description: 'Noise isolating Bluetooth 5.3 earbuds.',
-    price: { amount: 8999, currency: 'INR' },
-    images: ['https://images.unsplash.com/photo-1585386959984-a4155222cd05?auto=format&fit=crop&w=600&q=60'],
-    stock: 37
-  }
-];
+// const sampleProducts = [
+//   {
+//     _id: 'p1',
+//     title: 'test_product',
+//     description: 'test_description',
+//     price: { amount: 999, currency: 'INR' },
+//     images: ['https://ik.imagekit.io/hnoglyswo0/kodr_phase_1/faac7bd7-de98-41c6-81ee-1662f17e7ac5_p8DgQjfuxw'],
+//     stock: 20
+//   },
+//   {
+//     _id: 'p2',
+//     title: 'Minimal Backpack',
+//     description: 'Durable & water resistant everyday carry.',
+//     price: { amount: 4599, currency: 'INR' },
+//     images: ['https://images.unsplash.com/photo-1514474959185-1472d4d4b221?auto=format&fit=crop&w=600&q=60'],
+//     stock: 4
+//   },
+//   {
+//     _id: 'p3',
+//     title: 'Ceramic Mug',
+//     description: 'Hand glazed stoneware mug 350ml.',
+//     price: { amount: 1299, currency: 'INR' },
+//     images: ['https://images.unsplash.com/photo-1556909114-6d2a7926f397?auto=format&fit=crop&w=600&q=60'],
+//     stock: 0
+//   },
+//   {
+//     _id: 'p4',
+//     title: 'Wireless Earbuds',
+//     description: 'Noise isolating Bluetooth 5.3 earbuds.',
+//     price: { amount: 8999, currency: 'INR' },
+//     images: ['https://images.unsplash.com/photo-1585386959984-a4155222cd05?auto=format&fit=crop&w=600&q=60'],
+//     stock: 37
+//   }
+// ];
 
 export default function Home() {
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState('newest');
+  const [products,setProducts] = useState([])
+
+  useEffect(()=>{
+    axios.get('http://localhost:3000/api/products/')
+    .then(response => {
+      console.log(response.data.products)
+      setProducts(response.data.products || [])
+    } ).catch(err => {
+      console.error('Failed to fetch products',err)
+    })
+
+
+  },[])
+
+
+    
+
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    let list = sampleProducts.filter(p => !q || p.title.toLowerCase().includes(q) || (p.description||'').toLowerCase().includes(q));
+    let list = products.filter(p => !q || p.title.toLowerCase().includes(q) || (p.description||'').toLowerCase().includes(q));
     switch (sort) {
       case 'price-asc': list = [...list].sort((a,b)=>a.price.amount - b.price.amount); break;
       case 'price-desc': list = [...list].sort((a,b)=>b.price.amount - a.price.amount); break;
@@ -51,7 +71,7 @@ export default function Home() {
       default: break; // newest placeholder
     }
     return list;
-  }, [query, sort]);
+  }, [query, sort,products]);
 
   return (
     <div className="home-shell" aria-labelledby="home-heading">
@@ -87,10 +107,13 @@ export default function Home() {
       ) : (
         <div className="products-grid" role="list" aria-label="Products">
           {filtered.map(p => {
-            const cover = p.images?.[0];
+            const cover = p.image?.[0];
             const priceFmt = new Intl.NumberFormat('en-IN',{style:'currency', currency:p.price.currency}).format(p.price.amount/100);
             const low = p.stock < 5;
             return (
+              <Link to={`/product/${p._id}`} className="product-card-link">
+
+
               <article key={p._id} className="p-card" role="listitem" aria-label={p.title}>
                 {cover ? <img src={cover} alt={p.title} className="p-thumb" loading="lazy" /> : <div className="p-thumb" aria-hidden="true" />}
                 <div className="p-body">
@@ -102,6 +125,8 @@ export default function Home() {
                   </div>
                 </div>
               </article>
+
+              </Link>
             );
           })}
         </div>

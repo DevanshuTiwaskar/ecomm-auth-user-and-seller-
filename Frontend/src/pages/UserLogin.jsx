@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios  from 'axios'
+
 import './UserLogin.css';
 import './UserRegister.css'; // reuse base auth styles
 
@@ -13,10 +15,29 @@ export default function UserLogin() {
     setForm(f => ({ ...f, [name]: value }));
   }
 
+
+
   function handleSubmit(e) {
     e.preventDefault();
     // UI only – submission logic intentionally omitted.
+    const data = {password: form.password}
+
+    if(form.identifier.includes('@')){
+      data.email = form.identifier
+    }
+    else{
+      data.usename = form.identifier
+    }
+     
+
+    axios.post("http://localhost:3000/api/auth/user/login",data,{withCredentials:true})
+    .then(response => {
+        console.log(response.data)
+        navigate('/home')
+    })
   }
+
+
 
   function switchRole(nextRole) {
     if (nextRole === role) return;

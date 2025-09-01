@@ -50,7 +50,57 @@ async function getSellerProducts(req, res) {
 
 }
 
+
+async function getAllProduct(req,res){
+
+    const page = req.query.page ? parseInt(req.query.page) : 1
+    
+  const products = await productModel.find()
+  .skip((page - 1) * 5)
+  .limit(5)
+    
+
+
+   res.status(200).json({
+    message: "all product fetched successfully",
+    products
+   })
+}
+
+
+async function getProductDetails(req,res){
+
+
+   try {
+       const {id} = req.params
+    
+       const product = await productModel.findById(id)
+       
+       if(!product){
+        return res.status(404).json({
+            message:"product not found"
+        })
+       }
+    
+       res.json(product)
+    
+   } catch (error) {
+      
+    res.status(5000).json({
+        message: "error fetching product details",
+        error
+    })
+   }
+
+
+
+
+
+}
+
 module.exports = {
     createProduct,
-    getSellerProducts
+    getSellerProducts,
+    getAllProduct,
+    getProductDetails
 }

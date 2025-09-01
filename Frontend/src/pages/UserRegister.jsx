@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios  from 'axios'
 import './UserRegister.css';
 
 export default function UserRegister() {
@@ -21,6 +22,21 @@ export default function UserRegister() {
   function handleSubmit(e) {
     e.preventDefault();
     // UI only – submission logic intentionally omitted.
+
+
+
+    axios.post("http://localhost:3000/api/auth/user/register",{
+      username: form.username,
+      fullName: {
+        firstName: form.firstName,
+        lastName: form.lastName
+      },
+      email: form.email,
+      password: form.password
+    },{withCredentials:true}).then(response=>{
+      console.log(response.data)
+      navigate("/home")
+    })
   }
 
   function switchRole(nextRole) {

@@ -1,66 +1,95 @@
-import { useMemo, useState } from 'react';
-import './SellerDashboard.css';
+import { useMemo, useState } from "react";
+import "./SellerDashboard.css";
+import { useEffect } from "react";
+import axios from "axios";
+import { Link } from "react-router-dom";
 
 // UI only: Simulated response from GET /api/products/seller
-const sampleResponse = {
-  message: 'seller products fetched successfully',
-  products: [
-    {
-      price: { amount: 999, currency: 'INR' },
-      _id: '68afff7ee028efd52c3fe63e',
-      title: 'test_product',
-      description: 'test_description',
-      images: [
-        'https://ik.imagekit.io/hnoglyswo0/kodr_phase_1/faac7bd7-de98-41c6-81ee-1662f17e7ac5_p8DgQjfuxw',
-        'https://ik.imagekit.io/hnoglyswo0/kodr_phase_1/e22e71f1-7299-497a-8d4d-6d79c6372bb2_EVDvZvd55C'
-      ],
-      seller: '68aeb500ca9c0189a33d9378',
-      stock: 20,
-      __v: 0
-    }
-  ]
-};
+// const sampleResponse = {
+//   message: 'seller products fetched successfully',
+//   products: [
+//     {
+//       price: { amount: 999, currency: 'INR' },
+//       _id: '68afff7ee028efd52c3fe63e',
+//       title: 'test_product',
+//       description: 'test_description',
+//       images: [
+//         'https://ik.imagekit.io/hnoglyswo0/kodr_phase_1/faac7bd7-de98-41c6-81ee-1662f17e7ac5_p8DgQjfuxw',
+//         'https://ik.imagekit.io/hnoglyswo0/kodr_phase_1/e22e71f1-7299-497a-8d4d-6d79c6372bb2_EVDvZvd55C'
+//       ],
+//       seller: '68aeb500ca9c0189a33d9378',
+//       stock: 20,
+//       __v: 0
+//     }
+//   ]
+// };
 
 export default function SellerDashboard() {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
+  const [products, setProducts] = useState([]);
 
   // In real implementation, fetch products & set state.
-  const products = sampleResponse.products; // placeholder
+  // const products = sampleResponse.products; // placeholder
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:3000/api/products/seller", {
+        withCredentials: true,
+      })
+      .then((response) => {
+        console.log(response.data.products);
+        setProducts(response.data.products);
+      })
+      .catch((error) => {
+        console.log("failed to fatched allseller product", error);
+      });
+  }, []);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return products;
-    return products.filter(p =>
-      p.title.toLowerCase().includes(q) ||
-      (p.description || '').toLowerCase().includes(q)
+    return products.filter(
+      (p) =>
+        p.title.toLowerCase().includes(q) ||
+        (p.description || "").toLowerCase().includes(q)
     );
   }, [products, query]);
 
   const totalStock = filtered.reduce((acc, p) => acc + (p.stock || 0), 0);
   const totalProducts = filtered.length;
-  const lowStockCount = filtered.filter(p => p.stock !== undefined && p.stock < 5).length;
+  const lowStockCount = filtered.filter(
+    (p) => p.stock !== undefined && p.stock < 5
+  ).length;
 
   return (
     <div className="dashboard-shell role-seller" aria-labelledby="dash-title">
       <header className="dash-header">
-        <h1 id="dash-title" className="dash-title">Seller Dashboard</h1>
+        <h1 id="dash-title" className="dash-title">
+          Seller Dashboard
+        </h1>
         <p className="dash-sub">Overview of your products & stock status.</p>
       </header>
 
       <section className="cards-grid" aria-label="Metrics">
         <div className="metric-card">
           <span className="metric-label">Products</span>
-          <span className="metric-value" aria-live="polite">{totalProducts}</span>
+          <span className="metric-value" aria-live="polite">
+            {totalProducts}
+          </span>
           <span className="metric-foot">Total active products</span>
         </div>
         <div className="metric-card">
           <span className="metric-label">Stock Units</span>
-          <span className="metric-value" aria-live="polite">{totalStock}</span>
+          <span className="metric-value" aria-live="polite">
+            {totalStock}
+          </span>
           <span className="metric-foot">Combined available stock</span>
         </div>
         <div className="metric-card">
           <span className="metric-label">Low Stock</span>
-          <span className="metric-value" aria-live="polite">{lowStockCount}</span>
+          <span className="metric-value" aria-live="polite">
+            {lowStockCount}
+          </span>
           <span className="metric-foot">Below threshold (&lt;5)</span>
         </div>
       </section>
@@ -74,7 +103,7 @@ export default function SellerDashboard() {
               placeholder="Search products..."
               aria-label="Search products"
               value={query}
-              onChange={e => setQuery(e.target.value)}
+              onChange={(e) => setQuery(e.target.value)}
             />
           </div>
         </div>
@@ -86,26 +115,47 @@ export default function SellerDashboard() {
           </div>
         ) : (
           <div className="products-grid" role="list">
-            {filtered.map(p => {
+            {filtered.map((p) => {
               const cover = p.images?.[0];
-              const priceFmt = new Intl.NumberFormat('en-IN', { style: 'currency', currency: p.price.currency }).format(p.price.amount / 100);
+              const priceFmt = new Intl.NumberFormat("en-IN", {
+                style: "currency",
+                currency: p.price.currency,
+              }).format(p.price.amount / 100);
               const low = p.stock < 5;
               return (
-                <article key={p._id} className="product-card" role="listitem" aria-label={p.title}>
-                  {cover ? (
-                    <img src={cover} alt={p.title} className="product-thumb" loading="lazy" />
-                  ) : (
-                    <div className="product-thumb" aria-hidden="true" />
-                  )}
-                  <div className="product-body">
-                    <h3 className="product-title" title={p.title}>{p.title}</h3>
-                    <p className="product-desc" title={p.description}>{p.description}</p>
-                    <div className="price-stock">
-                      <span className="price">{priceFmt}</span>
-                      <span className={`stock ${low ? 'low' : ''}`}>{p.stock} in stock</span>
+                <Link to={`/product/${p._id}`} className="product-card-link">
+                  <article
+                    key={p._id}
+                    className="product-card"
+                    role="listitem"
+                    aria-label={p.title}
+                  >
+                    {cover ? (
+                      <img
+                        src={cover}
+                        alt={p.title}
+                        className="product-thumb"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="product-thumb" aria-hidden="true" />
+                    )}
+                    <div className="product-body">
+                      <h3 className="product-title" title={p.title}>
+                        {p.title}
+                      </h3>
+                      <p className="product-desc" title={p.description}>
+                        {p.description}
+                      </p>
+                      <div className="price-stock">
+                        <span className="price">{priceFmt}</span>
+                        <span className={`stock ${low ? "low" : ""}`}>
+                          {p.stock} in stock
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                </article>
+                  </article>
+                </Link>
               );
             })}
           </div>
