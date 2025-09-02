@@ -1,12 +1,7 @@
-import { useMemo, useState,useEffect } from 'react';
-import './Home.css';
-<<<<<<< HEAD
-import axios from 'axios';
-import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
-=======
-import axios from "axios"
->>>>>>> 6cf8996621dda0cb515dfc9e84400505210ae5aa
+import { useMemo, useState, useEffect } from "react";
+import "./Home.css";
+import axios from "axios";
+import { Link } from "react-router-dom";
 
 // UI only: sample products similar shape to seller endpoint
 // const sampleProducts = [
@@ -45,57 +40,63 @@ import axios from "axios"
 // ];
 
 export default function Home() {
-  const [query, setQuery] = useState('');
-  const [sort, setSort] = useState('newest');
-<<<<<<< HEAD
-  const [products,setProducts] = useState([])
+  document.title = "E-commerce | Home Page";
+  const [query, setQuery] = useState("");
+  const [sort, setSort] = useState("newest");
+  const [products, setProducts] = useState([]);
 
-  useEffect(()=>{
-    axios.get('http://localhost:3000/api/products/')
-    .then(response => {
-      console.log(response.data.products)
-      setProducts(response.data.products || [])
-    } ).catch(err => {
-      console.error('Failed to fetch products',err)
-    })
+  useEffect(() => {
+    axios
+      .get("http://localhost:3000/api/products/")
+      .then((response) => {
+        console.log(response.data.products);
+        setProducts(response.data.products || []);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch products", err);
+      });
+  }, []);
 
+  useEffect(() => {
+    axios.get("http://localhost:3000/api/products/").then((response) => {
+      setProducts(response.data.products);
+    });
+  });
 
-  },[])
-
-
-    
-
-=======
-  const [products, setProducts] = useState([])
->>>>>>> 6cf8996621dda0cb515dfc9e84400505210ae5aa
-
-  useEffect(()=>{
-
-    axios.get("http://localhost:3000/api/products/")
-    .then(response=>{
-      setProducts(response.data.products)
-    })
-    
-  })
-  
-  
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    let list = products.filter(p => !q || p.title.toLowerCase().includes(q) || (p.description||'').toLowerCase().includes(q));
+    let list = products.filter(
+      (p) =>
+        !q ||
+        p.title.toLowerCase().includes(q) ||
+        (p.description || "").toLowerCase().includes(q)
+    );
     switch (sort) {
-      case 'price-asc': list = [...list].sort((a,b)=>a.price.amount - b.price.amount); break;
-      case 'price-desc': list = [...list].sort((a,b)=>b.price.amount - a.price.amount); break;
-      case 'stock': list = [...list].sort((a,b)=>b.stock - a.stock); break;
-      default: break; // newest placeholder
+      case "price-asc":
+        list = [...list].sort((a, b) => a.price.amount - b.price.amount);
+        break;
+      case "price-desc":
+        list = [...list].sort((a, b) => b.price.amount - a.price.amount);
+        break;
+      case "stock":
+        list = [...list].sort((a, b) => b.stock - a.stock);
+        break;
+      default:
+        break; // newest placeholder
     }
     return list;
-  }, [query, sort,products]);
+  }, [query, sort, products]);
 
   return (
     <div className="home-shell" aria-labelledby="home-heading">
       <section className="home-hero">
-        <h1 id="home-heading" className="home-title">Discover products</h1>
-        <p className="home-sub">Browse a curated selection of items. This UI uses sample data only – integrate your API later to power real listings.</p>
+        <h1 id="home-heading" className="home-title">
+          Discover products
+        </h1>
+        <p className="home-sub">
+          Browse a curated selection of items. This UI uses sample data only –
+          integrate your API later to power real listings.
+        </p>
       </section>
 
       <div className="products-toolbar">
@@ -105,16 +106,25 @@ export default function Home() {
             placeholder="Search products..."
             aria-label="Search products"
             value={query}
-            onChange={e=>setQuery(e.target.value)}
+            onChange={(e) => setQuery(e.target.value)}
           />
-          <select aria-label="Sort products" value={sort} onChange={e=>setSort(e.target.value)}>
+          <select
+            aria-label="Sort products"
+            value={sort}
+            onChange={(e) => setSort(e.target.value)}
+          >
             <option value="newest">Newest</option>
             <option value="price-asc">Price: Low → High</option>
             <option value="price-desc">Price: High → Low</option>
             <option value="stock">Stock</option>
           </select>
         </div>
-        <div style={{fontSize:'.65rem', color:'var(--color-text-soft)'}} aria-live="polite">{filtered.length} products</div>
+        <div
+          style={{ fontSize: ".65rem", color: "var(--color-text-soft)" }}
+          aria-live="polite"
+        >
+          {filtered.length} products
+        </div>
       </div>
 
       {products.length === 0 ? (
@@ -124,31 +134,54 @@ export default function Home() {
         </div>
       ) : (
         <div className="products-grid" role="list" aria-label="Products">
-<<<<<<< HEAD
-          {filtered.map(p => {
-            const cover = p.image?.[0];
-=======
-          {products.map(p => {
-            const cover = p.images?.[0];
->>>>>>> 6cf8996621dda0cb515dfc9e84400505210ae5aa
-            const priceFmt = new Intl.NumberFormat('en-IN',{style:'currency', currency:p.price.currency}).format(p.price.amount/100);
+          {filtered.map((p) => {
+            const cover = p.image?.[0]?.replace(
+              "/upload/",
+              "/tr:w-400,h-400,c-maintain_ratio,f-auto,q-80/"
+            );
+
+            const priceFmt = new Intl.NumberFormat("en-IN", {
+              style: "currency",
+              currency: p.price.currency,
+            }).format(p.price.amount / 100);
             const low = p.stock < 5;
             return (
-              <Link to={`/product/${p._id}`} className="product-card-link">
-
-
-              <article key={p._id} className="p-card" role="listitem" aria-label={p.title}>
-                {cover ? <img src={cover} alt={p.title} className="p-thumb" loading="lazy" /> : <div className="p-thumb" aria-hidden="true" />}
-                <div className="p-body">
-                  <h3 className="p-title" title={p.title}>{p.title}</h3>
-                  <p className="p-desc" title={p.description}>{p.description}</p>
-                  <div className="p-price-row">
-                    <span className="p-price">{priceFmt}</span>
-                    <span className={`p-stock ${low ? 'low' : ''}`}>{p.stock > 0 ? `${p.stock} in stock` : 'Out of stock'}</span>
+              <Link
+                key={p._id}
+                to={`/product/${p._id}`}
+                className="product-card-link"
+              >
+                <article
+                  key={p._id}
+                  className="p-card"
+                  role="listitem"
+                  aria-label={p.title}
+                >
+                  {cover ? (
+                    <img
+                      src={cover}
+                      alt={p.title}
+                      className="p-thumb"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="p-thumb" aria-hidden="true" />
+                  )}
+                  <div className="p-body">
+                    <h3 className="p-title" title={p.title}>
+                      {p.title}
+                    </h3>
+                    <p className="p-desc" title={p.description}>
+                      {p.description}
+                    </p>
+                    <div className="p-price-row">
+                      <span className="p-price">{priceFmt}</span>
+                      <span className={`p-stock ${low ? "low" : ""}`}>
+                        {p.stock > 0 ? `${p.stock} in stock` : "Out of stock"}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              </article>
-
+                </article>
               </Link>
             );
           })}

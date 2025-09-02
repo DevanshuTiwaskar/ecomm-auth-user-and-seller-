@@ -23,7 +23,6 @@ router.get("/seller",
     
 )
 
-<<<<<<< HEAD
 router.get('/',
     productController.getAllProduct
 )
@@ -34,10 +33,8 @@ router.get('/:id',
 
 
 
-=======
-router.get("/",
-    productController.getAllProducts
-)
+// router.get("/",
+//     productController.
+// )
 
->>>>>>> 6cf8996621dda0cb515dfc9e84400505210ae5aa
 module.exports = router;

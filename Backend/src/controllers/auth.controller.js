@@ -149,9 +149,33 @@ async function registerSeller(req, res) {
 }
 
 
+
+function getCurrentUser(req, res) {
+    const u = req.user;
+    if (!u) return res.status(401).json({ message: 'Unauthorized' });
+    res.status(200).json({
+        message: 'current user fetched successfully',
+        user: {
+            id: u._id,
+            username: u.username,
+            email: u.email,
+            fullName: u.fullName,
+            role: u.role
+        }
+    });
+}
+
+function logout(req, res) {
+    res.cookie('token', '', { maxAge: 0 });
+    res.status(200).json({ message: 'logged out' });
+}
+
+
 module.exports = {
     registerUser,
     loginUser,
-    registerSeller
+    registerSeller,
+    getCurrentUser,
+    logout
 }
 

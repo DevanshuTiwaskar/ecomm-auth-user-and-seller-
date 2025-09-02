@@ -4,7 +4,6 @@ import axios  from 'axios'
 
 import './UserLogin.css';
 import './UserRegister.css'; // reuse base auth styles
-import axios from 'axios';
 
 export default function UserLogin() {
   const [ form, setForm ] = useState({ identifier: '', password: '' });
@@ -20,7 +19,6 @@ export default function UserLogin() {
 
   function handleSubmit(e) {
     e.preventDefault();
-<<<<<<< HEAD
     // UI only – submission logic intentionally omitted.
     const data = {password: form.password}
 
@@ -36,23 +34,6 @@ export default function UserLogin() {
     .then(response => {
         console.log(response.data)
         navigate('/home')
-=======
-
-    const data = { password: form.password }
-
-    if (form.identifier.includes('@')) {
-      data.email = form.identifier
-    } else {
-      data.username = form.identifier
-    }
-
-    axios.post("http://localhost:3000/api/auth/user/login", data,{
-      withCredentials: true
-    })
-    .then(response => {
-      console.log(response.data)
-      navigate('/home');
->>>>>>> 6cf8996621dda0cb515dfc9e84400505210ae5aa
     })
   }
 

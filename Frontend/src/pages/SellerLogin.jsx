@@ -15,43 +15,25 @@ export default function SellerLogin() {
   }
 
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-<<<<<<< HEAD
     // UI only – no API logic
      const data = {password: form.password}
 
      if(form.identifier.includes('@')){
-      data.email = form.email
+      data.email = form.identifier
      }else{
-      data.username = form.username
-
+      data.username = form.identifier
      }
+     console.log(data)
       
-     axios.post('http://localhost:3000/api/auth/seller/login',data,{withCredentials:true})
+    await axios.post('http://localhost:3000/api/auth/seller/login',data,{withCredentials:true})
      .then(response => {
       console.log(response.data)
       navigate("/seller/dashboard")
      })
       
       
-=======
-    const data = { password: form.password }
-
-    if (form.identifier.includes('@')) {
-      data.email = form.identifier
-    }
-    else {
-      data.username = form.identifier
-    }
-
-    axios.post("http://localhost:3000/api/auth/seller/login",data,{withCredentials:true})
-    .then(response => {
-      console.log(response.data)
-      navigate('/seller/dashboard');
-    })
-
->>>>>>> 6cf8996621dda0cb515dfc9e84400505210ae5aa
   }
 
   function switchRole(nextRole) {

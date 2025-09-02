@@ -42,12 +42,12 @@ function handleSubmit(e) {
   formData.append("description", description);
   formData.append("stock", stock);
 
-  // 👇 Convert price object to JSON string
+  // Convert price object to JSON string
   formData.append("price", JSON.stringify({ amount: Number(priceAmount), currency }));
 
-  // 👇 Append images one by one
+  // Append images one by one
   images.forEach(img => {
-    formData.append("images", img.file);
+    formData.append("images",  img.file);
   });
 
   axios.post("http://localhost:3000/api/products/", formData, {
