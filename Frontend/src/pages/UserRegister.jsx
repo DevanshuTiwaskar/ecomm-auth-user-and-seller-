@@ -35,7 +35,7 @@ export default function UserRegister() {
       password: form.password
     },{withCredentials:true}).then(response=>{
       console.log(response.data)
-      navigate("/home")
+      navigate("/")
     })
   }
 
