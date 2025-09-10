@@ -18,7 +18,10 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser())
 app.use(cors({
-  origin: "https://ecomm-auth-user-and-seller.vercel.app",
+  origin: [
+  "http://localhost:5173",
+  "https://ecomm-auth-user-and-seller.vercel.app"
+],
   credentials: true
 }));
 
