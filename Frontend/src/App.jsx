@@ -25,7 +25,7 @@ function App() {
 
         {/* App layout with role-based nav */}
         <Route element={<AppLayout />}> 
-          <Route path="/home" element={<Home />} />
+          <Route path="/" element={<Home />} />
           <Route path="/product/:id" element={<ProductDetails />} />
           <Route path="/seller/dashboard" element={<SellerDashboard />} />
           <Route path="/seller/products/create" element={<SellerProductCreate />} />
