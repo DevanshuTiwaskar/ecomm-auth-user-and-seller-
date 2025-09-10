@@ -3,7 +3,7 @@ import { configureStore } from "@reduxjs/toolkit";
 // import productReducer from "./slices/ProductSlice";
 // import sellerReducer from "./slices/SellerSlice";
 
-import userReducer from './slices/userSlice'
+import userReducer from './slices/UserSlice'
 import productReducer from "./slices/ProductSlice"
 import sellerReducer from "./slices/SellerSlice"
 
