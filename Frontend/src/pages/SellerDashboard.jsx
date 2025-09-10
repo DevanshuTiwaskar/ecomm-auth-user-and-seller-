@@ -1,50 +1,22 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import "./SellerDashboard.css";
-import { useEffect } from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
-
-// UI only: Simulated response from GET /api/products/seller
-// const sampleResponse = {
-//   message: 'seller products fetched successfully',
-//   products: [
-//     {
-//       price: { amount: 999, currency: 'INR' },
-//       _id: '68afff7ee028efd52c3fe63e',
-//       title: 'test_product',
-//       description: 'test_description',
-//       images: [
-//         'https://ik.imagekit.io/hnoglyswo0/kodr_phase_1/faac7bd7-de98-41c6-81ee-1662f17e7ac5_p8DgQjfuxw',
-//         'https://ik.imagekit.io/hnoglyswo0/kodr_phase_1/e22e71f1-7299-497a-8d4d-6d79c6372bb2_EVDvZvd55C'
-//       ],
-//       seller: '68aeb500ca9c0189a33d9378',
-//       stock: 20,
-//       __v: 0
-//     }
-//   ]
-// };
+import { useDispatch, useSelector } from "react-redux";
+import { fetchSellerProducts } from "../store/slices/SellerSlice";
 
 export default function SellerDashboard() {
   const [query, setQuery] = useState("");
-  const [products, setProducts] = useState([]);
+  const dispatch = useDispatch();
 
-  // In real implementation, fetch products & set state.
-  // const products = sampleResponse.products; // placeholder
+  // access state from Redux
+  const { products, loading, error } = useSelector((state) => state.seller);
 
+  // fetch products on mount
   useEffect(() => {
-    axios
-      .get("http://localhost:3000/api/products/seller", {
-        withCredentials: true,
-      })
-      .then((response) => {
-        console.log(response.data.products);
-        setProducts(response.data.products);
-      })
-      .catch((error) => {
-        console.log("failed to fatched allseller product", error);
-      });
-  }, []);
+    dispatch(fetchSellerProducts());
+  }, [dispatch]);
 
+  // filter by search query
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return products;
@@ -55,6 +27,7 @@ export default function SellerDashboard() {
     );
   }, [products, query]);
 
+  // metrics
   const totalStock = filtered.reduce((acc, p) => acc + (p.stock || 0), 0);
   const totalProducts = filtered.length;
   const lowStockCount = filtered.filter(
@@ -69,6 +42,10 @@ export default function SellerDashboard() {
         </h1>
         <p className="dash-sub">Overview of your products & stock status.</p>
       </header>
+
+      {/* Loading & error states */}
+      {loading && <p>Loading products...</p>}
+      {error && <p className="error">❌ {error}</p>}
 
       <section className="cards-grid" aria-label="Metrics">
         <div className="metric-card">
@@ -108,7 +85,7 @@ export default function SellerDashboard() {
           </div>
         </div>
 
-        {filtered.length === 0 ? (
+        {filtered.length === 0 && !loading ? (
           <div className="empty-state" role="status">
             <strong>No products found</strong>
             Try adjusting your search.
@@ -123,9 +100,12 @@ export default function SellerDashboard() {
               }).format(p.price.amount / 100);
               const low = p.stock < 5;
               return (
-                <Link to={`/product/${p._id}`} className="product-card-link">
+                <Link
+                  to={`/product/${p._id}`}
+                  key={p._id}
+                  className="product-card-link"
+                >
                   <article
-                    key={p._id}
                     className="product-card"
                     role="listitem"
                     aria-label={p.title}

@@ -45,12 +45,12 @@ async function registerUser(req, res) {
     try {
 
         const { user, token } = await createUser({
-            email,
+            username,
             fullName: {
                 firstName,
                 lastName
             },
-            username,
+            email,
             password
         })
 

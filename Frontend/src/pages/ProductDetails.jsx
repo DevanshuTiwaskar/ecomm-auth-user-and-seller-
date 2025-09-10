@@ -2,27 +2,108 @@ import { useParams } from "react-router-dom";
 import { useState } from "react";
 import "./ProductDetails.css";
 import { useEffect } from "react";
-import axios from "axios";
 import Checkout from "../components/Checkout";
-
-
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProductById } from "../store/slices/ProductSlice";
+import axios from "axios";
 
 export default function ProductDetails() {
   const { id } = useParams();
+  const dispatch = useDispatch();
 
-  const [product, setProduct] = useState(null);
+  const {
+    current: product,
+    loading,
+    error,
+  } = useSelector((state) => state.product || {});
+
+
+
+
+
   const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchProductById(id));
+    }
+  }, [id, dispatch]);
+
+  if (loading) {
+    return (
+      <div className="pd-shell">
+        <p>loading product.. </p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="pd-shell">
+        <p style={{ color: "red" }}>Error: {error}</p>
+      </div>
+    );
+  }
+
+
+
+
+async function handleBuy() {
+  try {
+    const response = await axios.post(`http://localhost:3000/api/payment/create/${id}`, {}, { withCredentials: true });
+    console.log(response.data);
+
+    const options = {
+      key: "rzp_test_R8ii8fDuBn4fEH",
+      amount: response.data.orderamount,
+      currency: response.data.order.currency,
+      name: "My ecomm",
+      description: "Test Transaction",
+      order_id: response.data.order.orderId,
+      handler: async function (razorResponse) {
+        try {
+          const verifyRes = await axios.post("http://localhost:3000/api/payment/verify", {
+            razorpayOrderId: razorResponse.razorpay_order_id,
+            razorpayPaymentId: razorResponse.razorpay_payment_id,
+            signature: razorResponse.razorpay_signature
+          }, { withCredentials: true });
+
+          console.log("Payment verified:", verifyRes.data);
+        } catch (err) {
+          console.error("Verification error:", err);
+        }
+      },
+      prefill: {
+        name: `${response.data.user.fullName.firstName} ${response.data.user.fullName.lastName}`,
+        email: response.data.user.email
+      },
+      theme: { color: "#3399cc" }
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+
+  } catch (err) {
+    console.error("Payment creation error:", err);
+  }
+}
+
+
+
+
+  
+  // const [product, setProduct] = useState(null);
 
   // const product = useMemo(() => sampleProducts.find(p => p._id === id) || sampleProducts[0], [id]);
 
-  useEffect(() => {
-    axios
-      .get(`http://localhost:3000/api/products/${id}`)
-      .then((res) => setProduct(res.data))
-      .catch((error) =>
-        console.log("error fetching product details from api", error)
-      );
-  }, [id]);
+  // useEffect(() => {
+  //   axios
+  //     .get(`http://localhost:3000/api/products/${id}`)
+  //     .then((res) => setProduct(res.data))
+  //     .catch((error) =>
+  //       console.log("error fetching product details from api", error)
+  //     );
+  // }, [id]);
 
   if (!product) {
     return (
@@ -36,6 +117,7 @@ export default function ProductDetails() {
     style: "currency",
     currency: product.price.currency,
   }).format(product.price.amount / 100);
+
   const activeImage = product.images?.[activeIndex];
   const out = product.stock <= 0;
 
@@ -75,14 +157,11 @@ export default function ProductDetails() {
           {priceFmt}
         </div>
         <p className="pd-desc">{product.description}</p>
+
+
+
         <div className="pd-actions">
-          {!out ? (
-            <Checkout product={product} />
-          ) : (
-            <button className="btn-buy" disabled>
-              Unavailable
-            </button>
-          )}
+            <button onClick={handleBuy} className="btn-buy" disabled={out}>{out ? 'Unavailable' : 'Buy now'}</button>
         </div>
 
         <div className="pd-meta">

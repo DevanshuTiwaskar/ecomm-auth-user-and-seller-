@@ -1,32 +1,35 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-// Mongoose Payment Schema with Validation
-const paymentSchema = mongoose.Schema({
-    orderId: {
-        type: String,
-        required: true,
-      },
-      paymentId: {
-        type: String,
-      },
-      signature: {
-        type: String,
-      },
-      amount: {
-        type: Number,
-        required: true,
-      },
-      currency: {
-        type: String,
-        required: true,
-      },
-      status: {
-        type: String,
-        default: 'pending',
-      },
-});
+const paymentSchema = new mongoose.Schema({
+  orderId: {
+    type: String,
+    required: true,
+  },
+  paymentId: {
+    type: String,
+  },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "user",
+    required: true
+  },
+  signature: {
+    type: String,
+  },
+  amount: {
+    type: Number,
+    required: true,
+  },
+  currency: {
+    type: String,
+    required: true,
+  },
+  status: {
+    type: String,
+    default: 'pending',
+  },
+}, { timestamps: true });
 
-// Mongoose Model
-const paymentModel = mongoose.model("payment", paymentSchema);
+const Payment = mongoose.model('Payment', paymentSchema);
 
-module.exports = paymentModel ;
+module.exports = Payment;

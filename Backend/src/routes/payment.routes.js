@@ -1,9 +1,17 @@
-const express = require("express");
-const { createOrder, verifyPayment } = require("../controllers/payment.controller");
+const express = require("express")
+const authMiddleware = require("../middlewares/auth.middleware")
+const paymentController = require("../controllers/payment.controller")
 
-const router = express.Router();
+const router = express.Router()
 
-router.post("/create-order", createOrder);
-router.post("/verify-payment", verifyPayment);
 
-module.exports = router;
+/* POST /api/payments/create/productId */
+// router.post("/create/:productId", authMiddleware.authUser, paymentController.createPayment)
+router.post("/create/:id",authMiddleware.authUser,  paymentController.createPayment)
+
+
+/* POST /api/payments/verify */
+// router.post("/verify", authMiddleware.authUser, paymentController.verifyPayment)
+router.post("/verify",authMiddleware.authUser , paymentController.verifyPayment)
+
+module.exports = router

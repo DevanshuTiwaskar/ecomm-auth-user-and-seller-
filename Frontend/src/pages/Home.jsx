@@ -41,8 +41,11 @@ import { Link } from "react-router-dom";
 
 export default function Home() {
   document.title = "E-commerce | Home Page";
+
   const [query, setQuery] = useState("");
+
   const [sort, setSort] = useState("newest");
+
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
@@ -65,6 +68,7 @@ export default function Home() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
+
     let list = products.filter(
       (p) =>
         !q ||
@@ -135,10 +139,14 @@ export default function Home() {
       ) : (
         <div className="products-grid" role="list" aria-label="Products">
           {filtered.map((p) => {
-            const cover = p.image?.[0]?.replace(
-              "/upload/",
-              "/tr:w-400,h-400,c-maintain_ratio,f-auto,q-80/"
-            );
+            const cover = p.images?.[0]
+              ? p.images[0].includes("/upload/")
+                ? p.images[0].replace(
+                    "/upload/",
+                    "/tr:w-400,h-400,c-maintain_ratio,f-auto,q-80/"
+                  )
+                : p.images[0] // if not an ImageKit/Cloudinary link, use original
+              : null;
 
             const priceFmt = new Intl.NumberFormat("en-IN", {
               style: "currency",

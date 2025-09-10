@@ -1,63 +1,99 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './SellerRegister.css';
-import './UserRegister.css'; // reuse base auth styles
-import axios from 'axios';
-
+// src/pages/SellerRegister.jsx
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { sellerRegister } from "../store/slices/SellerSlice"; // ✅ correct thunk
+import "./SellerRegister.css";
+import "./UserRegister.css"; // reuse base auth styles
 
 export default function SellerRegister() {
   const [form, setForm] = useState({
-    username: '',
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: ''
+    username: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
   });
-  const role = 'seller';
+
+  const role = "seller";
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const { seller, loading, error } = useSelector((state) => state.seller);
 
   function handleChange(e) {
     const { name, value } = e.target;
-    setForm(f => ({ ...f, [name]: value }));
+    setForm((f) => ({ ...f, [name]: value }));
   }
 
   function handleSubmit(e) {
     e.preventDefault();
-    // UI only – no API logic
-     axios.post("http://localhost:3000/api/auth/seller/register",{
-      username : form.username,
+
+    // ✅ backend probably expects fullName as an object
+    const payload = {
+      username: form.username,
       email: form.email,
+      password: form.password,
       fullName: {
         firstName: form.firstName,
-        lastName: form.lastName
+        lastName: form.lastName,
       },
-      password: form.password
-     },{withCredentials:true}).then(respose => {
-       console.log(respose.data)
-       navigate('/seller/dashboard')
-     })
+    };
 
-
-
+    dispatch(sellerRegister(payload));
   }
+
+  // Redirect after successful registration
+  useEffect(() => {
+    if (seller) {
+      navigate("/seller/dashboard");
+    }
+  }, [seller, navigate]);
 
   function switchRole(nextRole) {
     if (nextRole === role) return;
-    navigate(nextRole === 'seller' ? '/seller/register' : '/user/register');
+    navigate(nextRole === "seller" ? "/seller/register" : "/user/register");
   }
 
   return (
     <div className="auth-wrapper">
-      <div className="auth-card seller-register role-seller" role="region" aria-labelledby="seller-register-heading">
+      <div
+        className="auth-card seller-register role-seller"
+        role="region"
+        aria-labelledby="seller-register-heading"
+      >
         <div className="role-switch" role="tablist" aria-label="Account type">
-          <button type="button" role="tab" aria-selected={role==='user'} className={role==='user' ? 'active' : ''} onClick={() => switchRole('user')}>User</button>
-          <button type="button" role="tab" aria-selected={role==='seller'} className={role==='seller' ? 'active' : ''} onClick={() => switchRole('seller')}>Seller</button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={role === "user"}
+            className={role === "user" ? "active" : ""}
+            onClick={() => switchRole("user")}
+          >
+            User
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={role === "seller"}
+            className={role === "seller" ? "active" : ""}
+            onClick={() => switchRole("seller")}
+          >
+            Seller
+          </button>
         </div>
-        <span className="seller-badge" aria-hidden="true">SELLER</span>
+        <span className="seller-badge" aria-hidden="true">
+          SELLER
+        </span>
         <header className="auth-header">
-          <h1 id="seller-register-heading" className="auth-title">Create seller account</h1>
-          <p className="auth-subtitle">Start selling with us. Just a few details.</p>
+          <h1 id="seller-register-heading" className="auth-title">
+            Create seller account
+          </h1>
+          <p className="auth-subtitle">
+            Start selling with us. Just a few details.
+          </p>
         </header>
+
         <form className="auth-form" onSubmit={handleSubmit} noValidate>
           <div className="field-group">
             <label htmlFor="username">Username</label>
@@ -127,10 +163,22 @@ export default function SellerRegister() {
               minLength={8}
             />
           </div>
-          <button type="submit" className="submit-btn">Create seller account</button>
-          <p className="fine-print">By continuing you agree to our seller terms & privacy policy.</p>
+
+          {/* 🔹 Show error/loading */}
+          {loading && <p className="info">Registering...</p>}
+          {error && <p className="error">{error}</p>}
+
+          <button type="submit" className="submit-btn" disabled={loading}>
+            {loading ? "Creating account..." : "Create seller account"}
+          </button>
+          <p className="fine-print">
+            By continuing you agree to our seller terms & privacy policy.
+          </p>
         </form>
-  <p className="switch-auth">Already a seller? <a href="/seller/login">Sign in</a></p>
+
+        <p className="switch-auth">
+          Already a seller? <a href="/seller/login">Sign in</a>
+        </p>
       </div>
     </div>
   );

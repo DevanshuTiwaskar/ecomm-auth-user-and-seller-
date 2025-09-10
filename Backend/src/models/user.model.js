@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: [ "seller", "user" ],
+        enum: [ "seller", "user" ],//enum is used to restrict the value of a field to a specific set of values in simple terms it is used to define a set of allowed values for a field
         default: "user"
     },
     password: {

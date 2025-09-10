@@ -1,72 +1,61 @@
+import axios from "axios";
 import React from "react";
 
-const Checkout = ({ product }) => {
+const Checkout = () => {
+
   const handlePayment = async () => {
-    const res = await fetch("http://localhost:3000/api/payment/create-order", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        amount: product.price.amount, // use product price
-        userId: "64d8a2f12345abc67890xyz", // TODO: replace with logged-in user _id
-        products: [product._id], // ✅ product from props
-        address: "123, Delhi, India"
-      })
-    });
+    try {
+      // Step 1: Create order on backend
+      const { data: order } = await axios.post("http://localhost:3000/api/payment/create-order", {
+        amount: 500 // Amount in INR
+      });
 
-    const order = await res.json();
+      // Step 2: Razorpay options
+      const options = {
+        key: "rzp_test_R8ii8fDuBn4fEH", // Use .env variable for frontend
+        amount: order.amount,
+        currency: order.currency,
+        name: "My Company",
+        description: "Test Transaction",
+        order_id: order.id,
+        handler: async function (response) {
+          const { order_id, payment_id, signature } = response;
+          try {
+            await axios.post("http://localhost:3000/api/payment/verify-payment", {
+              razorpayOrderId: order_id,
+              razorpayPaymentId: payment_id,
+              signature: signature,
+            });
+            alert("Payment successful!");
+          } catch (err) {
+            console.error(err);
+            alert("Payment verification failed!");
+          }
+        },
+        prefill: {
+          name: "Test User",
+          email: "test@example.com",
+          contact: "9999999999"
+        },
+        theme: {
+          color: "#3399cc"
+        }
+      };
 
-    const options = {
-      key: "rzp_test_R8ii8fDuBn4fEH",
-      amount: order.amount,
-      currency: order.currency,
-      name: "Ecommerce Store",
-      description: product.title,
-      order_id: order.id,
-      handler: async function (response) {
-        const verifyRes = await fetch("http://localhost:3000/api/payment/verify-payment", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_signature: response.razorpay_signature,
-            userId: "64d8a2f12345abc67890xyz"
-          })
-        });
+      const rzp = new window.Razorpay(options);
+      rzp.open();
 
-        const result = await verifyRes.json();
-        alert(result.message || "Payment processed");
-      },
-      prefill: {
-        name: "Devanshu",
-        email: "dev@example.com",
-        contact: "9999999999",
-      },
-      theme: {
-        color: "#3399cc",
-      },
-    };
-
-    const rzp = new window.Razorpay(options);
-    rzp.open();
+    } catch (err) {
+      console.error("Payment Error:", err);
+    }
   };
 
   return (
     <button 
       onClick={handlePayment} 
-      className="btn-buy"
-      style={{
-        backgroundColor: '#3399cc',
-        color: 'white',
-        padding: '12px 24px',
-        border: 'none',
-        borderRadius: '6px',
-        cursor: 'pointer',
-        fontSize: '16px',
-        fontWeight: '600'
-      }}
+      style={{ padding: "10px 20px", background: "#3399cc", color: "#fff", border: "none", borderRadius: "5px" }}
     >
-      Buy Now
+      Pay Now
     </button>
   );
 };
