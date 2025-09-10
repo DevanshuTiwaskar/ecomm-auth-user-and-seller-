@@ -1,13 +1,14 @@
 // src/redux/slices/sellerSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import api from "../../api/client";
+
 
 // Async thunk: fetch all seller products
 export const fetchSellerProducts = createAsyncThunk(
   "seller/fetchProducts",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await axios.get("http://localhost:3000/api/products/seller", {
+      const res = await api.get("/products/seller", {
         withCredentials: true,
       });
       return res.data.products;
@@ -22,8 +23,8 @@ export const sellerLogin = createAsyncThunk(
   "seller/login",
   async (credentials, { rejectWithValue }) => {
     try {
-      const res = await axios.post(
-        "http://localhost:3000/api/auth/seller/login",
+      const res = await api.post(
+        "/auth/seller/login",
         credentials,
         { withCredentials: true }
       );
@@ -39,8 +40,8 @@ export const sellerRegister = createAsyncThunk(
   "seller/register",
   async (formData, { rejectWithValue }) => {
     try {
-      const res = await axios.post(
-        "http://localhost:3000/api/auth/seller/register",
+      const res = await api.post(
+        "/auth/seller/register",
         formData,
         { withCredentials: true }
       );

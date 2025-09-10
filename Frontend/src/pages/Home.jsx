@@ -48,9 +48,13 @@ export default function Home() {
 
   const [products, setProducts] = useState([]);
 
+
+
+  
+
   useEffect(() => {
     axios
-      .get("http://localhost:3000/api/products/")
+      .get("https://ecomm-auth-user-and-seller.onrender.com/api/products/")
       .then((response) => {
         console.log(response.data.products);
         setProducts(response.data.products || []);
@@ -61,7 +65,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    axios.get("http://localhost:3000/api/products/").then((response) => {
+    axios.get("https://ecomm-auth-user-and-seller.onrender.com/api/products/").then((response) => {
       setProducts(response.data.products);
     });
   });

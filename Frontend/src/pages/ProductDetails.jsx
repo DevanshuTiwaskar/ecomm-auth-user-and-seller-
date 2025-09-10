@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import Checkout from "../components/Checkout";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProductById } from "../store/slices/ProductSlice";
-import axios from "axios";
+import api from "../api/client";
 
 export default function ProductDetails() {
   const { id } = useParams();
@@ -50,7 +50,7 @@ export default function ProductDetails() {
 
 async function handleBuy() {
   try {
-    const response = await axios.post(`http://localhost:3000/api/payment/create/${id}`, {}, { withCredentials: true });
+    const response = await api.post(`/payment/create/${id}`, {}, { withCredentials: true });
     console.log(response.data);
 
     const options = {
@@ -62,7 +62,7 @@ async function handleBuy() {
       order_id: response.data.order.orderId,
       handler: async function (razorResponse) {
         try {
-          const verifyRes = await axios.post("http://localhost:3000/api/payment/verify", {
+          const verifyRes = await api.post("/payment/verify", {
             razorpayOrderId: razorResponse.razorpay_order_id,
             razorpayPaymentId: razorResponse.razorpay_payment_id,
             signature: razorResponse.razorpay_signature
@@ -97,8 +97,8 @@ async function handleBuy() {
   // const product = useMemo(() => sampleProducts.find(p => p._id === id) || sampleProducts[0], [id]);
 
   // useEffect(() => {
-  //   axios
-  //     .get(`http://localhost:3000/api/products/${id}`)
+  //   api
+  //     .get(`/products/${id}`)
   //     .then((res) => setProduct(res.data))
   //     .catch((error) =>
   //       console.log("error fetching product details from api", error)

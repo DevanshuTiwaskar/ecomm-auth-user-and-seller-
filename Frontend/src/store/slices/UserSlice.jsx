@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+import api from "../../api/client";
 
 //lofin thunk
 export const loginUser = createAsyncThunk(
@@ -13,8 +13,8 @@ export const loginUser = createAsyncThunk(
         data.username = identifier;
       }
 
-      const res = await axios.post(
-        `http://localhost:3000/api/auth/${role}/login`,
+      const res = await api.post(
+        `/auth/${role}/login`,
         data,
         { withCredentials: true }
       );
@@ -32,8 +32,8 @@ export const registerUser = createAsyncThunk(
   "user/registerUser",
   async ({ form, role }, thunkAPI) => {
     try {
-      const res = await axios.post(
-        `http://localhost:3000/api/auth/${role}/register`,
+      const res = await api.post(
+        `/auth/${role}/register`,
         form,
         { withCredentials: true }
       );
