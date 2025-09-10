@@ -18,7 +18,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser())
 app.use(cors({
-  origin: "ecomm-auth-user-and-seller.vercel.app",
+  origin: "https://ecomm-auth-user-and-seller.vercel.app",
   credentials: true
 }));
 
